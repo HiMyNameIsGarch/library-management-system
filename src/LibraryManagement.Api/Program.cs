@@ -1,41 +1,33 @@
+using LibraryManagement.Core.Interfaces.Repositories;
+using LibraryManagement.Core.Interfaces.Services;
+using LibraryManagement.Core.Services;
+using LibraryManagement.Infrastructure.Data;
+using LibraryManagement.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddControllers();
 
+// Configure DbContext with SQLite ( or any other database provider )
+builder.Services.AddDbContext<LibraryDbContext>(options =>
+    options.UseSqlite("Data Source=library.db"));
+
+// Register repositories
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+
+// Register services
+builder.Services.AddScoped<IBookService, BookService>();
+
+// Build the application
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+// Enable routing
+app.UseRouting();
 
-app.UseHttpsRedirection();
+// Map controllers
+app.MapControllers();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
+// finally run the application with the configured services
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
