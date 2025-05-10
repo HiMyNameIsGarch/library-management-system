@@ -16,7 +16,7 @@ namespace LibraryManagement.Core.Services
 
         public async Task<IEnumerable<Book>> GetAllBooks()
         {
-            throw new NotImplementedException();
+            return await _bookRepository.GetAll();
         }
 
         public async Task<Book?> GetBookById(int id)
@@ -26,7 +26,8 @@ namespace LibraryManagement.Core.Services
 
         public async Task<Result<Book>> AddBook(Book book)
         {
-            throw new NotImplementedException();
+            await _bookRepository.Add(book);
+            return Result<Book>.Success(book);
         }
 
         public async Task<Result<bool>> UpdateBook(Book book)

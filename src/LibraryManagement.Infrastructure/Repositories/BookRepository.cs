@@ -1,6 +1,7 @@
 using LibraryManagement.Core.Entities;
 using LibraryManagement.Core.Interfaces.Repositories;
 using LibraryManagement.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement.Infrastructure.Repositories
 {
@@ -15,7 +16,8 @@ namespace LibraryManagement.Infrastructure.Repositories
 
         public async Task Add(Book book)
         {
-            throw new NotImplementedException();
+            await _context.Books.AddAsync(book);
+            await _context.SaveChangesAsync();
         }
 
         public async Task Update(Book book)
@@ -35,7 +37,7 @@ namespace LibraryManagement.Infrastructure.Repositories
 
         public async Task<IEnumerable<Book>> GetAll()
         {
-            throw new NotImplementedException();
+            return await _context.Books.ToListAsync();
         }
 
         public async Task<IEnumerable<Book>> Search(string? title, string? author, string? genre)

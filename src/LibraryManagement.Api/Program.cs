@@ -1,3 +1,4 @@
+using System.Text.Json;
 using LibraryManagement.Core.Interfaces.Repositories;
 using LibraryManagement.Core.Interfaces.Services;
 using LibraryManagement.Core.Services;
@@ -8,7 +9,12 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});;
 
 // Configure DbContext with SQLite ( or any other database provider )
 builder.Services.AddDbContext<LibraryDbContext>(options =>

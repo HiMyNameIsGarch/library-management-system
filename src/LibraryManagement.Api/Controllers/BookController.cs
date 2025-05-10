@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using LibraryManagement.Core.Entities;
 using LibraryManagement.Core.Interfaces.Services;
+using System.Text.Json;
 
 namespace LibraryManagement.Api.Controllers
 {
@@ -18,7 +19,8 @@ namespace LibraryManagement.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            return Ok("Hello World");
+            var books = await _bookService.GetAllBooks();
+            return Ok(books);
         }
 
         [HttpGet("{id}")]
@@ -31,7 +33,13 @@ namespace LibraryManagement.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Book book)
         {
-            throw new NotImplementedException();
+            var result = await _bookService.AddBook(book);
+            if(result == null)
+                return BadRequest("Book could not be added");
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return CreatedAtAction(nameof(GetById), new { id = book.Id }, book);
         }
 
         [HttpPut("{id}")]
