@@ -24,6 +24,6 @@ namespace LibraryManagement.Core.Interfaces.Services
 
         // searches multiple books based on the various criteria passed and returns
         // an enumerable object of books
-        Task<IEnumerable<Book>> SearchBooks(string? title, string? author, string? genre);
+        Task<IEnumerable<Book>> SearchBooks(string? title, string? author);
     }
 }

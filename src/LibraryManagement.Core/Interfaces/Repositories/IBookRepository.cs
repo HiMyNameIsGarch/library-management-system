@@ -23,6 +23,6 @@ namespace LibraryManagement.Core.Interfaces.Repositories
         Task<IEnumerable<Book>> GetAll();
 
         // Search for book based on various criteria ( for the future I need to handle the case of no parameters passed)
-        Task<IEnumerable<Book>> Search(string? title, string? author, string? genre);
+        Task<IEnumerable<Book>> Search(string? title, string? author);
     }
 }
