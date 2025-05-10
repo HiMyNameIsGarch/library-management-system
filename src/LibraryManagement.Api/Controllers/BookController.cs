@@ -26,8 +26,11 @@ namespace LibraryManagement.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
+            var book = await _bookService.GetBookById(id);
+            if (book == null)
+                return NotFound();
 
-            return Ok("Hello World");
+            return Ok(book);
         }
 
         [HttpPost]
@@ -45,19 +48,31 @@ namespace LibraryManagement.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] Book book)
         {
-            throw new NotImplementedException();
+            if (id != book.Id)
+                return BadRequest("ID mismatch");
+
+            var result = await _bookService.UpdateBook(book);
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            throw new NotImplementedException();
+            var result = await _bookService.DeleteBook(id);
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return NoContent();
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> Search([FromQuery] string? title, [FromQuery] string? author, [FromQuery] string? genre)
+        public async Task<IActionResult> Search([FromQuery] string? title, [FromQuery] string? author)
         {
-            throw new NotImplementedException();
+            var books = await _bookService.SearchBooks(title, author);
+            return Ok(books);
         }
     }
 }

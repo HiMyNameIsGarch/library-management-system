@@ -21,28 +21,70 @@ namespace LibraryManagement.Core.Services
 
         public async Task<Book?> GetBookById(int id)
         {
-            throw new NotImplementedException();
+            return await _bookRepository.GetById(id);
         }
 
         public async Task<Result<Book>> AddBook(Book book)
         {
-            await _bookRepository.Add(book);
-            return Result<Book>.Success(book);
+            try
+            {
+                await _bookRepository.Add(book);
+                return Result<Book>.Success(book);
+            }
+            catch (Exception ex)
+            {
+                return Result<Book>.Fail($"Error adding book: {ex.Message}");
+            }
         }
 
         public async Task<Result<bool>> UpdateBook(Book book)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var existingBook = await _bookRepository.GetById(book.Id);
+                if (existingBook == null)
+                    return Result<bool>.Fail("Book not found");
+
+                // Prevent invalid copies update
+                if (book.TotalCopies < existingBook.TotalCopies - existingBook.AvailableCopies)
+                    return Result<bool>.Fail("Cannot reduce total copies below currently borrowed count");
+
+                // Maintain consistency
+                book.AvailableCopies = existingBook.AvailableCopies + (book.TotalCopies - existingBook.TotalCopies);
+
+                await _bookRepository.Update(book);
+                return Result<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Fail($"Database error: {ex.Message}");
+            }
         }
 
         public async Task<Result<bool>> DeleteBook(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var book = await _bookRepository.GetById(id);
+                if (book == null)
+                    return Result<bool>.Fail("Book not found");
+
+                if (book.AvailableCopies < book.TotalCopies)
+                    return Result<bool>.Fail("Cannot delete book with borrowed copies");
+
+                await _bookRepository.Delete(id);
+                return Result<bool>.Success(true);
+            }
+            catch (Exception ex)
+            {
+                return Result<bool>.Fail($"Database error: {ex.Message}");
+            }
         }
 
-        public async Task<IEnumerable<Book>> SearchBooks(string? title, string? author, string? genre)
+        public async Task<IEnumerable<Book>> SearchBooks(string? title, string? author)
         {
-            throw new NotImplementedException();
+            var books = await _bookRepository.Search(title, author);
+            return books;
         }
 
     }
