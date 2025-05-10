@@ -22,17 +22,23 @@ namespace LibraryManagement.Infrastructure.Repositories
 
         public async Task Update(Book book)
         {
-            throw new NotImplementedException();
+            _context.Books.Update(book);
+            await _context.SaveChangesAsync();
         }
 
         public async Task Delete(int id)
         {
-            throw new NotImplementedException();
+            var book = await _context.Books.FindAsync(id);
+            if (book != null)
+            {
+                _context.Books.Remove(book);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<Book?> GetById(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Books.FindAsync(id);
         }
 
         public async Task<IEnumerable<Book>> GetAll()
@@ -40,9 +46,17 @@ namespace LibraryManagement.Infrastructure.Repositories
             return await _context.Books.ToListAsync();
         }
 
-        public async Task<IEnumerable<Book>> Search(string? title, string? author, string? genre)
+        public async Task<IEnumerable<Book>> Search(string? title, string? author)
         {
-            throw new NotImplementedException();
+            var query = _context.Books.AsQueryable();
+
+            if (!string.IsNullOrEmpty(title))
+                query = query.Where(b => b.Title.Contains(title));
+
+            if (!string.IsNullOrEmpty(author))
+                query = query.Where(b => b.Author.Contains(author));
+
+            return await query.ToListAsync();
         }
     }
 }
